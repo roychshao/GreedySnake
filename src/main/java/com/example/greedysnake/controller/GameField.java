@@ -3,6 +3,16 @@ package com.example.greedysnake.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+
 import java.awt.Point;
 
 public class GameField {
@@ -10,8 +20,7 @@ public class GameField {
     private static GameField instance;
     private List<Point> emptyPosition;
     private Random random;
-    private int width;
-    private int height;
+    private Pane gamePane;
 
     public GameField() {}
 
@@ -19,14 +28,17 @@ public class GameField {
 
         this.emptyPosition = new ArrayList<>();
         this.random = new Random();
-        this.width = width;
-        this.height = height;
 
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 this.emptyPosition.add(new Point(x, y));
             }
         }
+
+        gamePane = new Pane(); 
+        gamePane.setPrefSize(600, 500);
+        gamePane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        gamePane.setBorder(new Border(new BorderStroke(Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
     }
 
     public static GameField getInstance(int width, int height) {
@@ -39,15 +51,19 @@ public class GameField {
     public Point getAndUseAnEmptyPosition() {
         int randomIdx = random.nextInt(emptyPosition.size());
         Point emptyPoint = emptyPosition.get(randomIdx);
-        usePosition(randomIdx);
+        this.emptyPosition.remove(randomIdx);
         return emptyPoint;
     }
 
-    public void usePosition(int idx) {
-        instance.emptyPosition.remove(idx);
+    public void usePosition(Point p) {
+        this.emptyPosition.remove(p);
     }
 
     public void releasePosition(Point p) {
-        instance.emptyPosition.add(p);
+        this.emptyPosition.add(p);
+    }
+
+    public Pane getGamePane() {
+        return gamePane;
     }
 }

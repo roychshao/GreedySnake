@@ -1,11 +1,12 @@
 package com.example.greedysnake.controller;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
-import javafx.scene.input.KeyCode;
 
 import java.awt.Point;
 
@@ -17,19 +18,26 @@ public class GreedySnakeGame extends Application {
     private long lastUpdate = 0;
     private Snake snake;
     private Food food;
-    private Pane root;
+    private int score = 0;
+    private StackPane root;
+    private GameField gameField = GameField.getInstance(600/20, 500/20);
+    private UI ui = UI.getInstance();
+    private AnimationTimer gameLoop;
 
     @Override
     public void start(Stage primaryStage) {
-        root = new Pane();
-        Scene scene = new Scene(root, 800, 600);
-
+        root = new StackPane();
         snake = new Snake();
         food = new Food();
+        Scene scene = new Scene(root, 800, 700);
+        
+        gameField.getGamePane().getChildren().addAll(snake, food);
+        VBox centerBox = new VBox(gameField.getGamePane());
+        centerBox.setAlignment(Pos.CENTER);;
 
-        root.getChildren().addAll(snake, food);
+        root.getChildren().addAll(centerBox, ui.getTop());
 
-        new AnimationTimer() {
+        gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (now - lastUpdate >= UPDATE_INTERVAL) {
@@ -37,10 +45,12 @@ public class GreedySnakeGame extends Application {
                     lastUpdate = now;
                 }
             }
-        }.start();
+        };
 
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
+        gameLoop.start();
 
         // key listener
         scene.setOnKeyPressed(event -> {
@@ -64,20 +74,24 @@ public class GreedySnakeGame extends Application {
     }
 
     private void onUpdate() {
-        snake.move();
-        if (snake.checkCollisionWithSelf()) {
-            // TODO: game over
-            System.out.println("GAMEOVER");
+        
+        if (!snake.move()) {
+            gameOver();
         }
-        if (snake.checkCollisionWithWall()) {
-            // TODO: game over
-            System.out.println("GAMEOVER");
-        }
+        
         if (snake.checkCollisionWithFood(food)) {
+            score++;
+            ui.setScore(score); 
             snake.grow();
-            root.getChildren().remove(food);
+            gameField.getGamePane().getChildren().remove(food);
+            gameField.releasePosition(food.getPosition());
             food = new Food();
-            root.getChildren().add(food);
+            gameField.getGamePane().getChildren().add(food);
         }
+    }
+
+    private void gameOver() {
+        gameLoop.stop();
+        System.out.println("Game Over!");
     }
 }
