@@ -9,6 +9,6 @@ To survive, snake can not collide the wall, eat itself or catch by the trap.
 
 * How to run:
 ```
-mvn clean package
-mvn spring-boot:run
+./mvnw clean package
+./mvnw spring-boot:run
 ```
