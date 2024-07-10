@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.example.greedysnake.domain.Trap;
+
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -19,15 +24,21 @@ public class GameField {
 
     private static GameField instance;
     private List<Point> emptyPosition;
+    private List<Trap> traps;
     private Random random;
     private Pane gamePane;
+    private static int width;
+    private static int height;
 
     public GameField() {}
 
-    public GameField(int width, int height) {
+    public GameField(int w, int h) {
 
         this.emptyPosition = new ArrayList<>();
+        this.traps = new ArrayList<>();
         this.random = new Random();
+        width = w;
+        height = h;
 
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
@@ -37,8 +48,13 @@ public class GameField {
 
         gamePane = new Pane(); 
         gamePane.setPrefSize(600, 500);
+        gamePane.setBackground(new Background(new BackgroundFill(Color.web("#282C34"), new CornerRadii(15), new Insets(5, 5, 5, 5))));
         gamePane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        gamePane.setBorder(new Border(new BorderStroke(Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        gamePane.setBorder(new Border(new BorderStroke(Color.web("#ABB2BF"), BorderStrokeStyle.SOLID, new CornerRadii(15), new BorderWidths(5))));
+    }
+
+    public static void resetInstance() {
+        instance = new GameField(width, height);
     }
 
     public static GameField getInstance(int width, int height) {
@@ -61,6 +77,23 @@ public class GameField {
 
     public void releasePosition(Point p) {
         this.emptyPosition.add(p);
+    }
+
+    // public void clearPositions() {
+    //     this.emptyPosition.clear();
+    //     for (int x = 0; x < width; ++x) {
+    //         for (int y = 0; y < height; ++y) {
+    //             this.emptyPosition.add(new Point(x, y));
+    //         }
+    //     }
+    // }
+
+    public boolean isEmpty(Point p) {
+        return this.emptyPosition.contains(p);
+    }
+
+    public List<Trap> getTraps() {
+        return traps;
     }
 
     public Pane getGamePane() {

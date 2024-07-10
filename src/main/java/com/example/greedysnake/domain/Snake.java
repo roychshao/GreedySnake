@@ -1,6 +1,7 @@
 package com.example.greedysnake.domain;
 
 import javafx.scene.layout.Pane;
+import java.util.List;
 import java.util.LinkedList;
 import java.awt.Point;
 import com.example.greedysnake.controller.GameField;
@@ -10,19 +11,20 @@ public class Snake extends Pane {
     private LinkedList<SnakeBody> body;
     private Point direction;
     private Point lastTail;
-    private GameField gameField = GameField.getInstance(800/20, 600/20);
+    private GameField gameField = GameField.getInstance(600/20, 500/20);
 
 
     public Snake() {
         this.body = new LinkedList<>();
         this.body.add(new SnakeBody(new Point(200/20, 400/20)));
         this.direction = new Point(1, 0);
-       getChildren().addAll(body); 
+        gameField.usePosition(this.body.getFirst().getPosition());
+        getChildren().addAll(body); 
     }
 
     public boolean move() {
         Point nextHead = new Point(body.getFirst().getPosition().x + direction.x, body.getFirst().getPosition().y + direction.y);
-        if (checkCollisionWithWall(nextHead) || checkCollisionWithSelf(nextHead))
+        if (checkCollisionWithWall(nextHead) || checkCollisionWithSelf(nextHead) || checkCollisionWithTrap(gameField.getTraps()))
             return false;
 
         // Store the last tail position
@@ -71,9 +73,17 @@ public class Snake extends Pane {
 
     public boolean checkCollisionWithFood(Food food) {
         if (body.getFirst().getPosition().x == food.getPosition().x && body.getFirst().getPosition().y == food.getPosition().y) {
-            System.out.println("snake: " + body.getFirst().getPosition());
-            System.out.println("food: " + food.getPosition());
             return true;
+        }
+        return false;
+    }
+
+    public boolean checkCollisionWithTrap(List<Trap> traps) {
+        for (int i = 0; i < traps.size(); i++) {
+            if (body.getFirst().getPosition().x == traps.get(i).getPosition().x &&
+                body.getFirst().getPosition().y == traps.get(i).getPosition().y) {
+                return true;
+            }
         }
         return false;
     }
@@ -87,5 +97,9 @@ public class Snake extends Pane {
             return;
         }
         this.direction = newDirection;
+    }
+
+    public int getLength() {
+        return body.size();
     }
 }

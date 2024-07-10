@@ -14,8 +14,8 @@ public class Food extends Circle {
         Point emptyPoint = gameField.getAndUseAnEmptyPosition();
         this.position = emptyPoint;
         setRadius(10); // Half of the previous square size
-        setFill(Color.GREEN);
-        relocate(position.x * 20, position.y * 20);
+        setFill(Color.web("#98C379"));
+        relocate(position.x * 20, position.y * 20); 
     }
 
     public Point getPosition() {

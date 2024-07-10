@@ -14,7 +14,7 @@ public class SnakeBody extends Region {
     public SnakeBody(Point position) {
         this.position = position;
         setPrefSize(20, 20);
-        setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        setBackground(new Background(new BackgroundFill(Color.web("#61AFEF"), new CornerRadii(3), Insets.EMPTY)));
         relocate(position.x * 20, position.y * 20);
     }
 
