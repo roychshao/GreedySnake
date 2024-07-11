@@ -22,7 +22,7 @@ import java.awt.Point;
 
 public class GameField {
 
-    private static GameField instance;
+    private static volatile GameField instance;
     private List<Point> emptyPosition;
     private List<Trap> traps;
     private Random random;
@@ -32,7 +32,7 @@ public class GameField {
 
     public GameField() {}
 
-    public GameField(int w, int h) {
+    private GameField(int w, int h) {
 
         this.emptyPosition = new ArrayList<>();
         this.traps = new ArrayList<>();
@@ -58,13 +58,19 @@ public class GameField {
     }
 
     public static GameField getInstance(int width, int height) {
-        if (instance == null) {
-            instance = new GameField(width, height);
+        GameField result = instance;
+        if (result == null) {
+            synchronized (GameField.class) {
+                result = instance;
+                if (result == null) {
+                    instance = result = new GameField(width, height);
+                }
+            }
         }
-        return instance;
+        return result;
     }
 
-    public Point getAndUseAnEmptyPosition() {
+    public synchronized Point getAndUseAnEmptyPosition() {
         int randomIdx = random.nextInt(emptyPosition.size());
         Point emptyPoint = emptyPosition.get(randomIdx);
         this.emptyPosition.remove(randomIdx);
@@ -78,15 +84,6 @@ public class GameField {
     public void releasePosition(Point p) {
         this.emptyPosition.add(p);
     }
-
-    // public void clearPositions() {
-    //     this.emptyPosition.clear();
-    //     for (int x = 0; x < width; ++x) {
-    //         for (int y = 0; y < height; ++y) {
-    //             this.emptyPosition.add(new Point(x, y));
-    //         }
-    //     }
-    // }
 
     public boolean isEmpty(Point p) {
         return this.emptyPosition.contains(p);

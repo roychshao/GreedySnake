@@ -145,6 +145,7 @@ public class GreedySnakeGame extends Application {
 
         if (!trapQueue.isEmpty() && gameField.isEmpty(trapQueue.peek())) {
             Trap newTrap = new Trap(trapQueue.poll());
+            gameField.usePosition(newTrap.getPosition());
             gameField.getGamePane().getChildren().add(newTrap);
             gameField.getTraps().add(newTrap);
         }

@@ -13,7 +13,7 @@ import javafx.scene.paint.Color;
 
 public class UI {
 
-    private static UI instance;
+    private static volatile UI instance;
     private VBox vbox;
     private ToolBar topBar;
 	private Label scoreLabel;
@@ -21,7 +21,7 @@ public class UI {
     private Button restartBtn;
     private Button pauseBtn;
 
-	public UI() {
+	private UI() {
         topBar = new ToolBar();
         restartBtn = new Button("RESTART");
         restartBtn.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black; -fx-padding: 10px;");
@@ -62,9 +62,15 @@ public class UI {
     }
 
     public static UI getInstance() {
-        if (instance == null) {
-            instance = new UI();
+        UI result = instance;
+        if (result == null) {
+            synchronized (UI.class) {
+                result = instance;
+                if (result == null) {
+                    instance = result = new UI();
+                }
+            }
         }
-        return instance;
+        return result;
     }
 }
